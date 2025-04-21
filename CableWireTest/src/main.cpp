@@ -3,10 +3,9 @@
 //========= Variables =========//
 const int wires = 8;  // Number of wires to test
 const int TotalPins = wires * 2;  // Total number of pins (each wire has 2 pins)
-int NumberFailedConnections = 0;  // Tracks the number of failed wire connections
-int NumberShorts = 0;  // Tracks the number of shorts found
 String wireConnectionArray[16];  // Array to store the wire connection statuses (✅ or ❌)
 String shortsList[16];  // Array to store any shorts detected between wires
+
 
 //========= Methode declarations =========//
 void applyVoltage(int currentPin);  // Method to apply voltage (set pin to LOW)
@@ -14,12 +13,13 @@ void setPinModes(int currentPin);  // Method to set pin modes (OUTPUT for curren
 bool checkWireIntegrity(int currentOutputPin);  // Method to check the integrity of the wire (check if pin is connected correctly)
 String checkShorts(int currentOutputPin);  // Method to check for shorts between wires
 void checkCable();  // Method to check all wires and their connections
-void resetValues();  // Method to reset the failure and shorts counters
 
+//========= Main setup methode declaration =========//
 void setup() {
   Serial.begin(9600);  // Initialize serial communication at 9600 baud rate
 }
 
+//========= Main loop methode declaration =========//
 void loop() {
   checkCable();  // Start checking the cable connections and shorts
   Serial.println("");  // Empty line for better separation between checks
@@ -38,7 +38,6 @@ void loop() {
   }
 
   Serial.println("");  // Empty line after printing shorts
-  resetValues();  // Reset the failure and shorts counters after each check
   delay(800);  // Delay before performing the next check
 }
 
@@ -56,7 +55,6 @@ void checkCable() {
       wireConnectionArray[currentIteration] = "✅";  // Connection is intact
     } else {
       wireConnectionArray[currentIteration] = "❌";  // Connection failed
-      NumberFailedConnections++;  // Increment the count of failed connections
     }
 
     // Check for shorts and add the result to shortsList
@@ -64,11 +62,6 @@ void checkCable() {
 
     currentIteration++;  // Move to the next wire for the next iteration
   }
-}
-
-void resetValues() {
-  NumberFailedConnections = 0;  // Reset the failed connections count to 0
-  NumberShorts = 0;  // Reset the shorts count to 0
 }
 
 // Reset all pins to INPUT mode (no voltage applied)
@@ -117,7 +110,6 @@ String checkShorts(int currentOutputPin) {
     int value = digitalRead(pinToCheck);
     if (value == LOW) {
       result += "⚠️ A" + String(currentOutputPin - A0) + " --> A" + String(i) + "\n";  // Add short message to result
-      NumberShorts++;  // Increment shorts count
     }
   }
 
