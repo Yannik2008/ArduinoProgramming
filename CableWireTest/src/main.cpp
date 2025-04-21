@@ -4,6 +4,7 @@ const int wires = 8;  // Number of wires to test
 const int TotalPins = wires * 2;
 int NumberFailedConnections = 0;
 int NumberShorts = 0;
+String shortsList[16];
   // Choose one output pin to test
 
 void printPins();
@@ -21,37 +22,55 @@ void setup() {
 
 void loop() {
   checkCable();
+  Serial.println("");
+  /*
   Serial.println("Check finished!");
   Serial.println("Number of Failed connections: " + String(NumberFailedConnections));
   Serial.println("Number of Shorts: " + String(NumberShorts));
-  delay(10000);
+  */
   resetValues();
+  delay(800);
 }
 
 
 void checkCable() {
+  /*
   Serial.println("");
   Serial.println("Check for internal integrety and shorts started!");
   Serial.println("============================");
   Serial.println("");
-
+  */
+  int currentIteration = 0;
   for (int i = 0; i<wires; i++) {
+    
     int currentTestPin = A0 + i;
     setPinModes(currentTestPin);
     applyVoltage(currentTestPin);
   
     if (checkWireIntegrity(currentTestPin)) {
-      Serial.println("✅  Wire A" + String(currentTestPin - A0) + " --> A" + String(currentTestPin - A0 + 8) + " intact!");
+      Serial.print("✅");
+      //Serial.println("✅  Wire A" + String(currentTestPin - A0) + " --> A" + String(currentTestPin - A0 + 8) + " intact!");
     } else {
-      Serial.println("❌  Wire A" + String(currentTestPin - A0) + " --> A" + String(currentTestPin - A0 + 8) + " NOT intact!");
+      Serial.print("❌");
+      //Serial.println("❌  Wire A" + String(currentTestPin - A0) + " --> A" + String(currentTestPin - A0 + 8) + " NOT intact!");
       NumberFailedConnections ++;
     }
-  
-    Serial.print(checkShorts(currentTestPin));
+
+    shortsList[currentIteration] = (checkShorts(currentTestPin));
+    /*
     Serial.println("");
     Serial.println("============================");
     Serial.println("");
+    */
+   currentIteration ++;
   }
+  Serial.println("");
+  for (int i = 0; i<16;i++) {
+    if (shortsList[i] != ""){
+    Serial.println(shortsList[i]);
+  }
+}
+  
   
 }
 void resetValues() {
@@ -79,7 +98,7 @@ void setPinModes(int currentPin) {
 // Set the output pin to LOW to test connectivity
 void applyVoltage(int currentPin) {
   digitalWrite(currentPin, LOW);
-  Serial.println("Current reading on output pin A" + String(currentPin - A0) + ": " + String(digitalRead(currentPin)));
+  //Serial.println("Current reading on output pin A" + String(currentPin - A0) + ": " + String(digitalRead(currentPin)));
 }
 
 // Check if the corresponding input pin reads LOW (indicating connection)
@@ -100,9 +119,9 @@ String checkShorts(int currentOutputPin) {
 
     int value = digitalRead(pinToCheck);
     if (value == LOW) {
-      result += "⚠️  Short found between A" + String(currentOutputPin - A0) + " and A" + String(i) + "\n";
+      result += "⚠️ A" + String(currentOutputPin - A0) + " --> A" + String(i);
       NumberShorts ++;
     }
   }
-  return result + "Short search finished.\n";
+  return result;
 }
