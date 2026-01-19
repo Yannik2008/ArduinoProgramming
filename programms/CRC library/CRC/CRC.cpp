@@ -9,7 +9,7 @@
  *  DISCLAIMER: size includes the CRC Value at the last Byte of the array 
  * 
  * Created by Yannik F. Soyka, July 22, 2025.
- * NOT released into the public domain.
+ * Released into the public domain.
  */
 
 
